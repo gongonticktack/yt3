@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>YouTube Converter</title>
+    <style>:root { color-scheme: dark; }</style>
+    <link rel="stylesheet" href="/static/css/style.css">
+  </head>
+  <body>
+    <main class="card">
+      <div class="eyebrow">YouTube Converter</div>
+      <h1>YouTube MP3 / MP4 Converter</h1>
+      <p>入力した YouTube URL から、音声は MP3、動画は MP4 として保存できます。</p>
+      <form action="/convert" method="post">
+        <label for="url">YouTube URL</label>
+        <input id="url" name="url" placeholder="https://www.youtube.com/watch?v=..." required>
+        <button type="submit" name="format" value="mp3">Convert to MP3</button>
+        <button class="secondary" type="submit" name="format" value="mp4">Convert to MP4</button>
+      </form>
+      <p class="hint">対応ツール: yt-dlp + ffmpeg</p>
+    </main>
+    <script src="/static/js/main.js"></script>
+  </body>
+</html>

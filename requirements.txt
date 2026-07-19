@@ -1,0 +1,4 @@
+Flask>=3.0,<4.0
+pytest>=8.0,<9.0
+yt-dlp>=2024.12.13
+imageio-ffmpeg>=0.5,<1.0
