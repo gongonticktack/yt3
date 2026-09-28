@@ -16,10 +16,11 @@
 - Python 3.10 以上
 - Flask
 - yt-dlp
+- Deno 2.3 以上、または Node.js 22 以上（YouTube の JavaScript チャレンジ用）
 - imageio-ffmpeg
 - pytest
 
-`imageio-ffmpeg` を使うため、通常はWindowsへ別途 ffmpeg を手動インストールしなくても動作します。
+`imageio-ffmpeg` を使うため、通常はWindowsへ別途 ffmpeg を手動インストールしなくても動作します。JavaScript ランタイムは PATH に登録してください。Deno があればそれを、なければ Node.js を `yt-dlp` に指定します。`yt-dlp[default]` から EJS チャレンジ処理もインストールされます。
 
 手動で依存関係を入れる場合:
 
@@ -38,7 +39,10 @@ Windows では、プロジェクトフォルダの [start.bat](start.bat) をダ
 5. `pip` が使えるか確認します。
 6. [requirements.txt](requirements.txt) から必要なPythonパッケージをインストールします。
 7. `imageio-ffmpeg` 同梱の ffmpeg が使えるか確認します。
-8. `python -m src.run` で Flask アプリを起動します。
+8. YouTube 用の JavaScript ランタイムがあるか確認します。
+9. `python -m src.run` で Flask アプリを起動します。
+
+古い仮想環境で JavaScript ランタイムの警告や HTTP 403 が出た場合は、プロジェクトフォルダで `.venv\Scripts\python.exe -m pip install -U -r requirements.txt` を実行してから再起動してください。動画固有の公開範囲や YouTube 側の制限による 403 は、更新後も発生する場合があります。
 
 起動できたら、ブラウザで次のURLを開きます。
 
@@ -66,6 +70,7 @@ http://127.0.0.1:8000
 - `pip` を確認する
 - [requirements.txt](requirements.txt) の依存関係を入れる
 - `ffmpeg` が使えるか確認する
+- Deno または Node.js が使えるか確認する
 - Flask アプリを起動する
 
 ## 仕様
@@ -84,6 +89,18 @@ http://127.0.0.1:8000
 ```text
 .
 ├── .github/                  # GitHub / Copilot 向けの設定ファイル
+│   ├── copilot-instructions.md  # 作業内容に合うスキルへの道案内
+│   └── skills/               # このプロジェクトと用途別のスキル
+│       ├── .system/          # スキル・プラグイン管理など
+│       ├── aspnet-core/      # 用途別スキルの例（ほかにも直下に配置）
+│       ├── app-structure/   # アプリ構成と出力
+│       ├── ai-resource-efficiency/ # AI 全般の品質を保つリソース効率化
+│       ├── quality-checks/  # コード変更時の品質確認
+│       ├── readme/          # README の維持
+│       ├── ui-design/       # UI デザイン
+│       └── work-guidelines/ # 共通の作業方針
+├── docs/                     # 調査・運用資料
+│   └── skills-inventory.md   # スキル一覧と配置
 ├── output/                   # 変換後のMP3/MP4を保存する場所
 │   └── .gitkeep              # outputフォルダをGitに残すための空ファイル
 ├── src/                      # Flaskアプリ本体
@@ -136,4 +153,3 @@ python -m pytest
 ```
 
 現在のテストでは、トップページ表示、URL未入力時のエラー、MP4変換分岐、MP3/MP4変換コマンドの組み立てなどを確認しています。
-

@@ -3,6 +3,8 @@ import sys
 from types import SimpleNamespace
 from pathlib import Path
 
+import pytest
+
 from src import converter
 
 
@@ -29,6 +31,7 @@ def test_convert_youtube_to_mp3_uses_ffmpeg_to_write_mp3(monkeypatch, tmp_path):
     assert output_path.endswith(".mp3")
     assert len(calls) == 2
     assert calls[0][0] == "yt-dlp"
+    assert "--js-runtimes" in calls[0]
     assert "--extract-audio" not in calls[0]
     assert "--format" in calls[0]
     assert "bestaudio/best" in calls[0]
@@ -45,6 +48,40 @@ def test_resolve_ffmpeg_falls_back_to_bundled_package(monkeypatch):
     )
 
     assert converter._resolve_tool_path("ffmpeg") == "bundled-ffmpeg.exe"
+
+
+def test_youtube_download_uses_installed_node_when_deno_is_missing(monkeypatch, tmp_path):
+    calls = []
+
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        temp_dir = next((tmp_path / "output").glob("tmp_*"))
+        (temp_dir / "sample.webm").write_bytes(b"dummy")
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        converter.shutil,
+        "which",
+        lambda tool: None if tool == "deno" else ("C:/node/node.exe" if tool == "node" else tool),
+    )
+    monkeypatch.setattr(converter.subprocess, "run", fake_run)
+
+    converter.convert_youtube_to_mp3("https://www.youtube.com/watch?v=abc123")
+
+    assert calls[0][1:3] == ["--js-runtimes", "node:C:/node/node.exe"]
+
+
+def test_youtube_download_explains_missing_js_runtime(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        converter.shutil,
+        "which",
+        lambda tool: None if tool in {"deno", "node", "qjs"} else tool,
+    )
+
+    with pytest.raises(FileNotFoundError, match="Deno.*Node.js"):
+        converter.convert_youtube_to_mp3("https://www.youtube.com/watch?v=abc123")
 
 
 def test_convert_youtube_to_mp4_writes_mp4(monkeypatch, tmp_path):
@@ -70,7 +107,12 @@ def test_convert_youtube_to_mp4_writes_mp4(monkeypatch, tmp_path):
     assert output_path.endswith(".mp4")
     assert len(calls) == 2
     assert calls[0][0] == "yt-dlp"
+    assert "--js-runtimes" in calls[0]
     assert "--format" in calls[0]
+    assert calls[0][calls[0].index("--format") + 1].startswith(
+        "bestvideo[ext=mp4]+bestaudio[ext=m4a]"
+    )
+    assert "--ffmpeg-location" in calls[0]
     assert calls[1][0] == "ffmpeg"
     assert "-c:v" in calls[1]
     assert calls[1][-1] == str(Path("output") / "abc123.mp4")

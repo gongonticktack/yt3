@@ -78,6 +78,26 @@ def _resolve_tool_path(tool_name: str) -> str:
     raise FileNotFoundError(tool_name)
 
 
+def _youtube_js_runtime_args() -> list[str]:
+    """YouTube の JavaScript チャレンジに使うランタイムを選ぶ。
+
+    概要:
+        yt-dlp が利用できる Deno、Node.js、QuickJS を順に探します。
+    引数:
+        ありません。
+    戻り値:
+        yt-dlp に渡すランタイム指定の引数です。
+    """
+    for name, executable in (("deno", "deno"), ("node", "node"), ("quickjs", "qjs")):
+        path = shutil.which(executable)
+        if path:
+            return ["--js-runtimes", f"{name}:{path}"]
+    raise FileNotFoundError(
+        "JavaScript runtime が見つかりません。Deno 2.3 以上または Node.js 22 以上を"
+        "インストールし、PATH に追加してください。"
+    )
+
+
 def convert_youtube_to_mp3(url: str) -> str:
     """YouTube動画をMP3音声に変換する。
 
@@ -100,6 +120,7 @@ def convert_youtube_to_mp3(url: str) -> str:
     # ダウンロード用のyt-dlpと、変換用のffmpegの場所を確認します。
     yt_dlp = _resolve_tool_path("yt-dlp")
     ffmpeg = _resolve_tool_path("ffmpeg")
+    js_runtime_args = _youtube_js_runtime_args()
 
     # 一時フォルダに元データを置き、最後にMP3だけをoutputへ残します。
     with tempfile.TemporaryDirectory(dir=str(output_dir), prefix="tmp_", suffix="_audio") as temp_dir_name:
@@ -109,6 +130,7 @@ def convert_youtube_to_mp3(url: str) -> str:
         # yt-dlpには、まず一番よい音声データを保存してもらいます。
         download_command = [
             yt_dlp,
+            *js_runtime_args,
             "--format",
             "bestaudio/best",
             "--no-playlist",
@@ -186,17 +208,23 @@ def convert_youtube_to_mp4(url: str) -> str:
     # ダウンロード用のyt-dlpと、変換用のffmpegの場所を確認します。
     yt_dlp = _resolve_tool_path("yt-dlp")
     ffmpeg = _resolve_tool_path("ffmpeg")
+    js_runtime_args = _youtube_js_runtime_args()
 
     # 一時フォルダに元データを置き、最後にMP4だけをoutputへ残します。
     with tempfile.TemporaryDirectory(dir=str(output_dir), prefix="tmp_", suffix="_video") as temp_dir_name:
         temp_dir = Path(temp_dir_name)
         download_template = str(temp_dir / "%(title)s.%(ext)s")
 
-        # 音声と映像が両方入っている動画を、できるだけMP4形式で取得します。
+        # YouTube では映像と音声が別形式のことが多いため、両方を取得して結合します。
         download_command = [
             yt_dlp,
+            *js_runtime_args,
             "--format",
-            "best[ext=mp4][vcodec!=none][acodec!=none]/best[vcodec!=none][acodec!=none]",
+            "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best",
+            "--ffmpeg-location",
+            ffmpeg,
+            "--merge-output-format",
+            "mkv",
             "--no-playlist",
             "--output-na-placeholder",
             "",

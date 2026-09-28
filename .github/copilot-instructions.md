@@ -1,75 +1,37 @@
 # GitHub Copilot Instructions
 
-## 基本方針
+このファイルはスキルへの道案内です。作業内容に合う `.github/skills/` の `SKILL.md` を選び、実作業前に読んでください。全体の配置は [スキル一覧](../docs/skills-inventory.md) を参照してください。
 
-- 回答およびコード内の説明は日本語で記述する。
-- 既存の設計、命名規則、ディレクトリ構成を優先する。
-- 必要のないリファクタリングや仕様変更は行わない。
-- コードを変更する前に、関連する既存コードを確認する。
-- 不明な仕様を推測して実装しない。推測が必要な場合は、その内容を明示する。
-- プロジェクトフォルダ内にREADME.mdが存在しない場合、README.mdを作成する。
-- UI の変更時は、モダンでダーク調のデザインを優先し、ミニマルで洗練された見た目を維持する。
-- カラーパレットは深い青/黒基調、アクセントはシアンや紫を使い、可読性と高級感を両立させる。
-- 画面は中央寄せ、余白を多めに取り、カード型レイアウトやぼかし背景などを用いて現代的な印象を出す。
-- コードやリソースは機能ごとに分け、HTML/CSS/JavaScript はそれぞれ別ファイルに保つ。
-- 主要な実装は src フォルダ配下に配置し、テンプレート、静的アセット、ビジネスロジックを明確に分離する。
-- README にはディレクトリ構成を相対パス形式で明記し、主要フォルダとファイルの役割をわかりやすくまとめる。
-- 新しいフォルダやファイルを追加する場合は、README の構成一覧と実際の配置を一致させる。
-- 依存関係や起動手順は README に明記し、インストール・実行方法がすぐ分かる構成にする。
-- 既定の起動手順として、Windows では start.bat から .venv を有効化して Python を起動する構成を維持する。
-- 変換後の成果物は output フォルダに保存し、音声は MP3 形式で出力するようにする。
-- README の「仕組み」説明は、中学生でも理解しやすい平易な言葉で、どんな機能を使い、ユーザー操作から変換までどう流れるかを順番に整理する。
+通常の作業では、モデルやサービスを問わず [ai-resource-efficiency](skills/ai-resource-efficiency/SKILL.md) を参照してください。このリポジトリ固有の指示は、作業内容に応じて次を参照してください。
 
-## 関数・メソッドのドキュメント
+- 共通の作業方針: [work-guidelines](skills/work-guidelines/SKILL.md)
+- UI の変更: [ui-design](skills/ui-design/SKILL.md)
+- アプリ構成、起動、出力: [app-structure](skills/app-structure/SKILL.md)
+- README の作成・更新: [readme](skills/readme/SKILL.md)
+- コード変更後の説明・テスト・確認: [quality-checks](skills/quality-checks/SKILL.md)
 
-- 新規作成または変更するすべての公開関数、公開メソッド、公開クラスに説明文を付ける。
-- 説明文には次の項目を必ず含める。
-  - 概要
-  - 引数
-  - 戻り値
-- 使用言語の標準的なドキュメント形式を使う。
-  - Python: docstring
-  - TypeScript / JavaScript: JSDoc
-  - C#: XMLドキュメントコメント
-  - C++: Doxygen形式
+## スキルの選択
 
-## コード変更時のルール
+- 依頼の目的、対象ファイル、使用するサービス、各スキルの適用条件を照合する。名前の単語が一致するだけで選ばず、該当しないスキルは使わない。
+- 該当する `SKILL.md` を実作業前に読む。`references/`、`reference/`、`scripts/` は必要なものだけ確認する。
+- 複数のスキルを使う場合は、前提となるものから読む。Figma ファイル内の操作では `figma-use` を先に確認し、画面生成では `figma-generate-design` も確認する。デプロイでは依頼されたサービスのスキルを選ぶ。
+- スキルの指示よりユーザーの明示的な依頼を優先し、依頼の範囲外へ作業を広げない。
+- `openai-docs` は `skills/` 直下と `.system` に重複している。まず `.system` を確認し、必要なら直下の定義との差分を確認する。
 
-- コードを変更した場合は、README.mdの更新が必要か必ず確認する。
-- 以下に該当する変更ではREADME.mdも同時に更新する。
-  - 機能の追加または削除
-  - 使用方法の変更
-  - 設定値または環境変数の追加・変更
-  - API仕様の変更
-  - インストール手順や実行手順の変更
-  - ディレクトリ構成の変更
-- README.mdの更新が不要な場合は、最終回答でその理由を説明する。
+## 選択の目安
 
-## テスト
-
-- コードを追加または変更した場合は、対応するテストも追加または更新する。
-- バグ修正では、修正前に失敗し修正後に成功する回帰テストを追加する。
-- 実行可能なテスト、Lint、型チェックを実行する。
-- 実行できなかった場合は、実行できなかったコマンドと理由を明示する。
-
-## 変更後の確認
-
-変更完了前に、以下を確認する。
-
-1. 要求された機能を満たしていること
-2. 関数の説明文が不足していないこと
-3. README.mdの更新要否を確認したこと
-4. テストの追加・更新要否を確認したこと
-5. エラー処理が不足していないこと
-6. 既存機能に不要な影響を与えていないこと
-
-## 最終回答
-
-コード変更後の回答には、次の内容を記載する。
-
-- 変更したファイル
-- 変更内容
-- README.mdの更新内容、または更新不要と判断した理由
-- 追加・更新したテスト
-- 実行した確認コマンドと結果
-- 残っている注意点
+| 依頼 | スキル |
+| --- | --- |
+| ASP.NET Core / WinUI 3 | `aspnet-core` / `winui-app` |
+| ChatGPT Apps SDK、OpenAI 製品・API、Codex | `chatgpt-apps` / `openai-docs` |
+| CLI、Jupyter Notebook、ローカル Web アプリ | `cli-creator` / `jupyter-notebook` / `webapp-delivery` |
+| Figma の参照、作成、実装 | `figma` と目的に合う `figma-*` |
+| GitHub PR、CI、コミットから PR 作成 | `gh-address-comments` / `gh-fix-ci` / `yeet` |
+| Cloudflare、Netlify、Render、Vercel への公開 | 対応する `*-deploy` |
+| Linear、Notion | `linear` / 目的に合う `notion-*` |
+| PDF、画像、スクリーンショット、音声、文字起こし | `pdf` / `imagegen` / `screenshot` / `speech` / `transcribe` |
+| ブラウザー自動操作、対話的 UI 調査 | `playwright` / `playwright-interactive` |
+| 明示的なセキュリティレビュー、所有者分析、脅威分析 | `security-best-practices` / `security-ownership-map` / `security-threat-model` |
+| Sentry、Codex 用ペット | `sentry` / `hatch-pet` |
+| 目標定義、Codex への移行 | `define-goal` / `migrate-to-codex` |
+| スキル・プラグインの作成や導入 | `.system` の `skill-creator` / `skill-installer` / `plugin-creator` |

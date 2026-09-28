@@ -1,4 +1,5 @@
 @echo off
+title YT3
 setlocal EnableExtensions
 cd /d "%~dp0"
 set "PIP_DISABLE_PIP_VERSION_CHECK=1"
@@ -110,6 +111,15 @@ python -c "from src.converter import _resolve_tool_path; print(_resolve_tool_pat
 if errorlevel 1 (
     echo ffmpeg was not found and could not be installed automatically.
     echo Please check your internet connection, then run start.bat again.
+    echo Press any key to exit...
+    pause >nul
+    exit /b 1
+)
+
+echo Checking JavaScript runtime...
+python -c "from src.converter import _youtube_js_runtime_args; print(' '.join(_youtube_js_runtime_args()))"
+if errorlevel 1 (
+    echo Install Deno 2.3 or later or Node.js 22 or later, then run start.bat again.
     echo Press any key to exit...
     pause >nul
     exit /b 1
